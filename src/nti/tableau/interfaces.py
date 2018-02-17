@@ -12,8 +12,14 @@ from __future__ import absolute_import
 
 from zope import interface
 
+from nti.schema.field import ValidURI
+from nti.schema.field import DecodingValidTextLine as TextLine
+
 
 class ITableauInstance(interface.Interface):
     """
     Defines a Tableau instance
     """
+    url = ValidURI(title=u"The URL", required=True)
+    username = TextLine(title=u"The username", required=True)
+    password = TextLine(title=u"The password", required=True)

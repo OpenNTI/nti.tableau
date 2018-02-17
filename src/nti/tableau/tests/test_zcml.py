@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from hamcrest import none
 from hamcrest import is_not
 from hamcrest import assert_that
+from hamcrest import has_properties
 
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
@@ -27,12 +28,13 @@ ZCML_STRING = u"""
     i18n_domain='nti.tableau'>
 
     <include package="zope.component" />
-    <include package="nti.tableau" />
 
     <include package="." file="meta.zcml" />
 
-    <tableau:registerTableauInstance />
-
+    <tableau:registerTableauInstance
+                    url="https://tableau.nextthought.com" 
+                    username="myuser" 
+                    password="mypassword" />
 </configure>
 """
 
@@ -45,3 +47,7 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
         assert_that(tableau, is_not(none()))
         assert_that(tableau, validly_provides(ITableauInstance))
         assert_that(tableau, verifiably_provides(ITableauInstance))
+        assert_that(tableau,
+                    has_properties("url", "https://tableau.nextthought.com",
+                                   "username", "myuser",
+                                   "password", "mypassword"))
