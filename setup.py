@@ -56,6 +56,7 @@ setup(
         'setuptools',
         'beautifulsoup4',
         'lxml',
+        'nti.externalization',
         'nti.schema',
         'requests',
         'six',

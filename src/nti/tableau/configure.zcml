@@ -11,4 +11,7 @@
 
 	<include package="." file="meta.zcml" />
 
+	<include package="nti.externalization" file="meta.zcml" />
+	<include package="nti.externalization" />
+
 </configure>

@@ -20,8 +20,7 @@ from zope.cachedescriptors.property import readproperty
 
 from nti.tableau.interfaces import ITableauInstance
 
-XML_NS = {'t': 'http://tableau.com/api'}
-
+from nti.tableau.parsing import parse_workbooks
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -37,6 +36,34 @@ class Client(object):
     @readproperty
     def tableau(self):  # pylint: disable=method-hidden
         return component.queryUtility(ITableauInstance)
+
+    @classmethod
+    def encode(cls, text):
+        return text.encode(
+            'ascii', errors="backslashreplace"
+        ).decode('utf-8')
+
+    # workbooks
+    
+    def workbooks(self):
+        """
+        Returns a list of workbooks that the current user has permission to read
+        """
+        result = None
+        if self.token:
+            tableau = self.tableau
+            url = "%s/api/%s/sites/%s/users/%s/workbooks" % (tableau.url, tableau.api_version,
+                                                             self.site_id, self.user_id)
+            response = requests.get(url, headers={"x-tableau-auth": self.token})
+            if response.status_code == 200:
+                text = self.encode(response.text)
+                result = parse_workbooks(text)
+            else:
+                logger.error("Error getting workbooks [%s]. %s", url,
+                             response.text)
+        return result
+
+    # login/logout
 
     def sign_in(self, site=""):
         """
@@ -66,10 +93,7 @@ class Client(object):
         response = requests.post(url, data=xml_payload_for_request)
         if response.status_code == 200:
             # Reads and parses the response
-            text = response.text
-            text = text.encode(
-                'ascii', errors="backslashreplace"
-            ).decode('utf-8')
+            text = self.encode(response.text)
             xml_response = BeautifulSoup(text, 'xml')
             # Gets the token and site ID
             self.token = xml_response.find('credentials').get('token')

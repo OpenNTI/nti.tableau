@@ -14,6 +14,9 @@ from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_properties
 
+from nti.testing.matchers import validly_provides
+from nti.testing.matchers import verifiably_provides
+
 import unittest
 
 import fudge
@@ -23,6 +26,8 @@ from nti.tableau.client import Client
 from nti.tableau.model import TableauInstance
 
 from nti.tableau.tests import SharedConfiguringTestLayer
+
+from nti.tableau.interfaces import IWorkbook
 
 
 class TestClient(unittest.TestCase):
@@ -39,6 +44,63 @@ class TestClient(unittest.TestCase):
         client = Client()
         assert_that(client,
                     has_properties('tableau', is_(none())))
+
+    @fudge.patch('requests.get')
+    def test_workboks(self, mock_get):
+        client = Client(self.tableau())
+        client.token = u'6kOfTuDK'  # fake sign_in
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse xmlns="http://tableau.com/api"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://tableau.com/api
+                    http://tableau.com/api/ts-api-2.3.xsd">
+            <workbooks>
+                <workbook id="3c3c4ef3" name="major" contentUrl="major"
+                          showTabs="false" size="1" createdAt="2018-01-24T17:16:45Z"
+                          updatedAt="2018-02-19T22:25:21Z">
+                    <project id="9ba87b35" name="Default"/>
+                    <owner id="b163ca04"/>
+                    <tags>
+                        <tag label="Majors"/>
+                    </tags>
+                </workbook>
+            <workbooks>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
+        mock_get.is_callable().returns(data)
+        result = client.workbooks()
+        assert_that(result, has_length(1))
+        assert_that(result[0], validly_provides(IWorkbook))
+        assert_that(result[0], verifiably_provides(IWorkbook))
+        assert_that(result[0],
+                    has_properties('id', '3c3c4ef3',
+                                   'name', 'major',
+                                   'contentUrl', 'major',
+                                   'size', 1,
+                                   'owner', 'b163ca04',
+                                   'tags', is_(['Majors']),
+                                   'createdAt', is_(float),
+                                   'updatedAt', is_(float),
+                                   'project', has_properties('id', '9ba87b35',
+                                                             'name', 'Default')))
+
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse xmlns="http://tableau.com/api"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://tableau.com/api http://tableau.com/api/ts-api-2.3.xsd">
+            <error code="401001">
+                <summary>Workbooks Error</summary>
+                <detail>Error getting workbooks</detail>
+            </error>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=401)
+        mock_get.is_callable().returns(data)
+        result = client.workbooks()
+        assert_that(result, is_(none()))
 
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):

@@ -14,6 +14,8 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.schema.schema import SchemaConfigured
 
+from nti.tableau.interfaces import IProject
+from nti.tableau.interfaces import IWorkbook
 from nti.tableau.interfaces import ITableauInstance
 
 logger = __import__('logging').getLogger(__name__)
@@ -23,7 +25,12 @@ logger = __import__('logging').getLogger(__name__)
 class TableauInstance(SchemaConfigured):
     createDirectFieldProperties(ITableauInstance)
 
-    # pylint: disable=unused-argument
-    def __init__(self, *args, **kwargs):
-        # NOTE: Must ignore args
-        SchemaConfigured.__init__(self, **kwargs)
+
+@interface.implementer(IProject)
+class Project(SchemaConfigured):
+    createDirectFieldProperties(IProject)
+
+
+@interface.implementer(IWorkbook)
+class Workbook(SchemaConfigured):
+    createDirectFieldProperties(IWorkbook)

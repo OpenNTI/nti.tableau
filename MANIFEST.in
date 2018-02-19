@@ -16,3 +16,4 @@ recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include src *.zcml
 recursive-include src *.json
+recursive-include src *.xml
