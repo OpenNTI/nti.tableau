@@ -55,6 +55,7 @@ setup(
     install_requires=[
         'setuptools',
         'nti.schema',
+        'requests',
         'six',
         'zope.component',
         'zope.configuration',
