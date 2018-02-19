@@ -34,7 +34,8 @@ ZCML_STRING = u"""
     <tableau:registerTableauInstance
                     url="https://tableau.nextthought.com" 
                     username="myuser" 
-                    password="mypassword" />
+                    password="mypassword"
+                    site="mysite" />
 </configure>
 """
 
@@ -49,5 +50,6 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
         assert_that(tableau, verifiably_provides(ITableauInstance))
         assert_that(tableau,
                     has_properties("url", "https://tableau.nextthought.com",
+                                   "site", "mysite",
                                    "username", "myuser",
                                    "password", "mypassword"))
