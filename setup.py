@@ -54,6 +54,7 @@ setup(
     tests_require=TESTS_REQUIRE,
     install_requires=[
         'setuptools',
+        'beautifulsoup4',
         'nti.schema',
         'requests',
         'six',
