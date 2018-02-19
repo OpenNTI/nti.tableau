@@ -10,6 +10,8 @@ from __future__ import absolute_import
 
 import xml.etree.ElementTree as ET
 
+from bs4 import BeautifulSoup
+
 import requests
 
 from zope import component
@@ -47,7 +49,6 @@ class Client(object):
 
         :returns: The authentication token, the site ID and the user id
         """
-        from IPython.terminal.debugger import set_trace;set_trace()
         tableau = self.tableau
         site = site or tableau.site
         url = "%s/api/%s/auth/signin" % (tableau.url, tableau.api_version)
@@ -69,17 +70,11 @@ class Client(object):
             text = text.encode(
                 'ascii', errors="backslashreplace"
             ).decode('utf-8')
-            xml_response = ET.fromstring(text)
+            xml_response = BeautifulSoup(text, 'xml')
             # Gets the token and site ID
-            self.token = xml_response.find(
-                't:credentials', namespaces=XML_NS
-            ).attrib.get('token')
-            self.site_id = xml_response.find(
-                './/t:site', namespaces=XML_NS
-            ).attrib.get('id')
-            self.user_id = xml_response.find(
-                './/t:user', namespaces=XML_NS
-            ).attrib.get('id')
+            self.token = xml_response.find('credentials').get('token')
+            self.site_id = xml_response.find('site').get('id')
+            self.user_id = xml_response.find('user').get('id')
             result = self.token, self.site_id, self.user_id
         else:
             result = None
