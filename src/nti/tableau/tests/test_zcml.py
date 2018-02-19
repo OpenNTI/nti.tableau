@@ -17,6 +17,8 @@ from nti.testing.matchers import verifiably_provides
 
 from zope import component
 
+from nti.tableau import API_VERSION
+
 from nti.tableau.interfaces import ITableauInstance
 
 import nti.testing.base
@@ -52,4 +54,5 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
                     has_properties("url", "https://tableau.nextthought.com",
                                    "site", "mysite",
                                    "username", "myuser",
-                                   "password", "mypassword"))
+                                   "password", "mypassword",
+                                   "api_version", API_VERSION))

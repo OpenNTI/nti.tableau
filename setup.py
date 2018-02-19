@@ -54,8 +54,12 @@ setup(
     tests_require=TESTS_REQUIRE,
     install_requires=[
         'setuptools',
+        'beautifulsoup4',
+        'lxml',
         'nti.schema',
+        'requests',
         'six',
+        'zope.cachedescriptors',
         'zope.component',
         'zope.configuration',
         'zope.interface',

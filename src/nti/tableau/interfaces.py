@@ -15,6 +15,8 @@ from zope import interface
 from nti.schema.field import ValidURI
 from nti.schema.field import DecodingValidTextLine as TextLine
 
+from nti.tableau import API_VERSION
+
 
 class ITableauInstance(interface.Interface):
     """
@@ -29,3 +31,7 @@ class ITableauInstance(interface.Interface):
     site = TextLine(title=u"The site",
                     default=u'',
                     required=False)
+
+    api_version = TextLine(title=u"The api version",
+                           default=API_VERSION,
+                           required=True)
