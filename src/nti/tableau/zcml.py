@@ -38,14 +38,19 @@ class IRegisterTableauInstance(interface.Interface):
     
     password = fields.TextLine(title=u"The password",
                                required=True)
+    
+    site = fields.TextLine(title=u"The site",
+                           default=u'',
+                           required=False)
 
 
-def registerTableauInstance(_context, url, username, password):
+def registerTableauInstance(_context, url, username, password, site=u''):
     """
     Register a tableau instance with the specified context
     """
     factory = functools.partial(TableauInstance,
                                 url=url,
+                                site=site or u'',
                                 password=password,
                                 username=username)
     utility(_context, provides=ITableauInstance, factory=factory)
