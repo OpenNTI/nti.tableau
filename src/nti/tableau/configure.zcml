@@ -11,9 +11,4 @@
 
 	<include package="." file="meta.zcml" />
 
-	<!-- Directives -->
-	<configure zcml:condition="have testmode">
-		<tableau:registerTableauInstance />
-	</configure>
-
 </configure>
