@@ -55,6 +55,7 @@ setup(
     install_requires=[
         'setuptools',
         'beautifulsoup4',
+        'lxml',
         'nti.schema',
         'requests',
         'six',
