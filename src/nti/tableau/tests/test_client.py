@@ -86,6 +86,22 @@ class TestClient(unittest.TestCase):
                                    'project', has_properties('id', '9ba87b35',
                                                              'name', 'Default')))
 
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse xmlns="http://tableau.com/api"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://tableau.com/api http://tableau.com/api/ts-api-2.3.xsd">
+            <error code="401001">
+                <summary>Workbooks Error</summary>
+                <detail>Error getting workbooks</detail>
+            </error>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=401)
+        mock_get.is_callable().returns(data)
+        result = client.workbooks()
+        assert_that(result, is_(none()))
+
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):
         client = Client(self.tableau())
