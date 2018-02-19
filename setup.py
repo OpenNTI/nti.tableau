@@ -57,6 +57,7 @@ setup(
         'nti.schema',
         'requests',
         'six',
+        'zope.cachedescriptors',
         'zope.component',
         'zope.configuration',
         'zope.interface',
