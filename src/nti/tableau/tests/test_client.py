@@ -22,8 +22,12 @@ from nti.tableau.client import Client
 
 from nti.tableau.model import TableauInstance
 
+from nti.tableau.tests import SharedConfiguringTestLayer
+
 
 class TestClient(unittest.TestCase):
+
+    layer = SharedConfiguringTestLayer
 
     def tableau(self):
         return TableauInstance(url="https://tableau.ou.edu",

@@ -27,8 +27,3 @@ class TableauInstance(SchemaConfigured):
     def __init__(self, *args, **kwargs):
         # NOTE: Must ignore args
         SchemaConfigured.__init__(self, **kwargs)
-
-    @property
-    def server(self):
-        # pylint: disable=no-member
-        return self.url
