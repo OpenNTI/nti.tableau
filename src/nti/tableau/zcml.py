@@ -20,6 +20,8 @@ from zope.configuration import fields
 
 from zope.schema import URI
 
+from nti.tableau import API_VERSION
+
 from nti.tableau.interfaces import ITableauInstance
 
 from nti.tableau.model import TableauInstance
@@ -35,16 +37,20 @@ class IRegisterTableauInstance(interface.Interface):
 
     username = fields.TextLine(title=u"The username",
                                required=True)
-    
+
     password = fields.TextLine(title=u"The password",
                                required=True)
-    
+
     site = fields.TextLine(title=u"The site",
                            default=u'',
                            required=False)
 
+    api_version = fields.TextLine(title=u"The site",
+                                  default=API_VERSION,
+                                  required=False)
 
-def registerTableauInstance(_context, url, username, password, site=u''):
+
+def registerTableauInstance(_context, url, username, password, site=u'', api_version=API_VERSION):
     """
     Register a tableau instance with the specified context
     """
@@ -52,5 +58,6 @@ def registerTableauInstance(_context, url, username, password, site=u''):
                                 url=url,
                                 site=site or u'',
                                 password=password,
-                                username=username)
+                                username=username,
+                                api_version=api_version)
     utility(_context, provides=ITableauInstance, factory=factory)
