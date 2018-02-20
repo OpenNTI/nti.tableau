@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 from hamcrest import is_
 from hamcrest import none
+from hamcrest import is_not
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_properties
@@ -38,7 +39,7 @@ class TestClient(unittest.TestCase):
         return TableauInstance(url="https://tableau.ou.edu",
                                site="gjh",
                                username="higg2108",
-                               password="mypassword")
+                               password="N3xtTh0ught!!C")
 
     def test_coverage(self):
         client = Client()
@@ -46,7 +47,7 @@ class TestClient(unittest.TestCase):
                     has_properties('tableau', is_(none())))
 
     @fudge.patch('requests.get')
-    def test_workboks(self, mock_get):
+    def test_workbooks(self, mock_get):
         client = Client(self.tableau())
         client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
                                                    user_id='d1d34a6e',
@@ -75,7 +76,7 @@ class TestClient(unittest.TestCase):
         """
         data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
         mock_get.is_callable().returns(data)
-        result = client.workbooks()
+        result = client.get_workbooks()
         assert_that(result, has_length(1))
         assert_that(result[0], validly_provides(IWorkbook))
         assert_that(result[0], verifiably_provides(IWorkbook))
@@ -95,6 +96,43 @@ class TestClient(unittest.TestCase):
         data = fudge.Fake().has_attr(text=data).has_attr(status_code=401)
         mock_get.is_callable().returns(data)
         result = client.workbooks()
+        assert_that(result, is_(none()))
+
+    @fudge.patch('requests.get')
+    def test_query_workbook(self, mock_get):
+        client = Client(self.tableau())
+        client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
+                                                   user_id='d1d34a6e',
+                                                   token='6kOfTuDK')
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse xmlns="http://tableau.com/api"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://tableau.com/api
+                    http://tableau.com/api/ts-api-2.3.xsd">
+            <workbook id="3c3c4ef3" name="major" contentUrl="major"
+                      showTabs="false" size="1" createdAt="2018-01-24T17:16:45Z"
+                      updatedAt="2018-02-19T22:25:21Z">
+                <project id="9ba87b35" name="Default"/>
+                <owner id="b163ca04"/>
+                <tags>
+                    <tag label="Majors"/>
+                </tags>
+                <views>
+                    <view id="9a8a7b6b" contentUrl="Students/Majors" />
+                </views>
+            </workbook>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
+        mock_get.is_callable().returns(data)
+        workbook = client.query_workbook('e32c29b7')
+        assert_that(workbook, is_not(none()))
+
+        data = u"ERROR"
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=401)
+        mock_get.is_callable().returns(data)
+        result = client.query_workbook('xddz')
         assert_that(result, is_(none()))
 
     @fudge.patch('requests.post')
