@@ -14,8 +14,10 @@ from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.schema.schema import SchemaConfigured
 
+from nti.tableau.interfaces import ISite
 from nti.tableau.interfaces import IProject
 from nti.tableau.interfaces import IWorkbook
+from nti.tableau.interfaces import ICredentials
 from nti.tableau.interfaces import ITableauInstance
 
 logger = __import__('logging').getLogger(__name__)
@@ -24,6 +26,21 @@ logger = __import__('logging').getLogger(__name__)
 @interface.implementer(ITableauInstance)
 class TableauInstance(SchemaConfigured):
     createDirectFieldProperties(ITableauInstance)
+
+
+@interface.implementer(ISite)
+class Site(SchemaConfigured):
+    createDirectFieldProperties(ISite)
+
+
+@interface.implementer(ICredentials)
+class Credentials(SchemaConfigured):
+    createDirectFieldProperties(ICredentials)
+
+    @property
+    def site_id(self):
+        # pylint: disable=no-member
+        return self.site.id if self.site else None
 
 
 @interface.implementer(IProject)

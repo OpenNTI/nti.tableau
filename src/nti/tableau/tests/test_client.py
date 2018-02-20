@@ -9,7 +9,6 @@ from __future__ import absolute_import
 
 from hamcrest import is_
 from hamcrest import none
-from hamcrest import is_not
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_properties
@@ -28,6 +27,7 @@ from nti.tableau.model import TableauInstance
 from nti.tableau.tests import SharedConfiguringTestLayer
 
 from nti.tableau.interfaces import IWorkbook
+from nti.tableau.interfaces import ICredentials
 
 
 class TestClient(unittest.TestCase):
@@ -48,7 +48,9 @@ class TestClient(unittest.TestCase):
     @fudge.patch('requests.get')
     def test_workboks(self, mock_get):
         client = Client(self.tableau())
-        client.token = u'6kOfTuDK'  # fake sign_in
+        client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
+                                                   user_id='d1d34a6e',
+                                                   token='6kOfTuDK')
         data = u"""
         <?xml version='1.0' encoding='UTF-8'?>
         <tsResponse xmlns="http://tableau.com/api"
@@ -110,18 +112,16 @@ class TestClient(unittest.TestCase):
         data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
         mock_post.is_callable().returns(data)
         result = client.sign_in()
-        assert_that(result, is_not(none()))
-        assert_that(result, has_length(3))
-        assert_that(client,
+        assert_that(result, validly_provides(ICredentials))
+        assert_that(result, verifiably_provides(ICredentials))
+        assert_that(result,
                     has_properties('site_id', 'cb0f02e9',
                                    'user_id', 'd1d34a6e',
                                    'token', '6kOfTuDK'))
         # signout
         client.sign_out()
         assert_that(client,
-                    has_properties('site_id', is_(none()),
-                                   'user_id', is_(none()),
-                                   'token', is_(none())))
+                    has_properties('credentials', is_(none())))
         # invalid response
         data = u"""
         <?xml version='1.0' encoding='UTF-8'?>
