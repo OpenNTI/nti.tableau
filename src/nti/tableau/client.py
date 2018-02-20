@@ -10,8 +10,6 @@ from __future__ import absolute_import
 
 import xml.etree.ElementTree as ET
 
-from bs4 import BeautifulSoup
-
 import requests
 
 from zope import component
@@ -21,13 +19,14 @@ from zope.cachedescriptors.property import readproperty
 from nti.tableau.interfaces import ITableauInstance
 
 from nti.tableau.parsing import parse_workbooks
+from nti.tableau.parsing import parse_credentials
 
 logger = __import__('logging').getLogger(__name__)
 
 
 class Client(object):
 
-    site_id = token = user_id = None
+    credentials = None
 
     def __init__(self, tableau=None):
         if tableau is not None:
@@ -50,11 +49,14 @@ class Client(object):
         Returns a list of workbooks that the current user has permission to read
         """
         result = None
-        if self.token:
+        if self.credentials:
             tableau = self.tableau
+            # pylint: disable=no-member
             url = "%s/api/%s/sites/%s/users/%s/workbooks" % (tableau.url, tableau.api_version,
-                                                             self.site_id, self.user_id)
-            response = requests.get(url, headers={"x-tableau-auth": self.token})
+                                                             self.credentials.site_id, 
+                                                             self.credentials.user_id)
+            response = requests.get(url, 
+                                    headers={"x-tableau-auth": self.credentials.token})
             if response.status_code == 200:
                 text = self.encode(response.text)
                 result = parse_workbooks(text)
@@ -94,12 +96,7 @@ class Client(object):
         if response.status_code == 200:
             # Reads and parses the response
             text = self.encode(response.text)
-            xml_response = BeautifulSoup(text, 'xml')
-            # Gets the token and site ID
-            self.token = xml_response.find('credentials').get('token')
-            self.site_id = xml_response.find('site').get('id')
-            self.user_id = xml_response.find('user').get('id')
-            result = self.token, self.site_id, self.user_id
+            result = self.credentials = parse_credentials(text)
         else:
             result = None
             logger.error("Cannot sign_in to [%s]. %s", url,
@@ -110,8 +107,10 @@ class Client(object):
         """
         Destroys the active session
         """
-        if self.token:
+        if self.credentials:
             tableau = self.tableau
+            # pylint: disable=no-member
             url = "%s/api/%s/auth/signout" % (tableau.url, tableau.api_version)
-            requests.post(url, headers={'x-tableau-auth': self.token})
-            self.token = self.site_id = self.user_id = None
+            requests.post(url, 
+                          headers={'x-tableau-auth': self.credentials.token})
+            self.credentials = None

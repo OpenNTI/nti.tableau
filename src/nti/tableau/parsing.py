@@ -14,8 +14,10 @@ from bs4 import BeautifulSoup
 
 from zope.interface.common.idatetime import IDateTime
 
+from nti.tableau.model import Site
 from nti.tableau.model import Project
 from nti.tableau.model import Workbook
+from nti.tableau.model import Credentials
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -23,6 +25,29 @@ logger = __import__('logging').getLogger(__name__)
 def parse_datetime(value):
     value = IDateTime(value, None) if value else None
     return time.mktime(value.timetuple()) if value is not None else None
+
+
+def parse_credentials(text):
+    """
+    Returns the credentials from the specified text
+    """
+    result = None
+    xml_response = BeautifulSoup(text, 'xml')
+    node = xml_response.find('credentials')
+    if node:
+        result = Credentials(token=node.get('token'))
+        # site
+        site = node.find('site')
+        if site:
+            site = Site(id=site.get('id'),
+                        name=site.get('name'),
+                        contentUrl=site.get('contentUrl'))
+            result.site = site
+        # user
+        user = node.find('user')
+        if user:
+            result.user_id = user.get('id')
+    return result
 
 
 def parse_workbooks(text):

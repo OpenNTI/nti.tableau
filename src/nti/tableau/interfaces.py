@@ -60,6 +60,31 @@ class ITableauInstance(interface.Interface):
                            required=True)
 
 
+class ISite(interface.Interface):
+    """
+    Defines a Tableau site
+    """
+    id = TextLine(title=u"The id", required=True)
+
+    name = TextLine(title=u"The name", required=False)
+    
+    contentUrl = TextLine(title=u"The content URL",
+                          required=False)
+
+
+class ICredentials(interface.Interface):
+    """
+    Defines a Tableau sign-in credentials
+    """
+    token = TextLine(title=u"The token", required=True)
+
+    user_id = TextLine(title=u"The user id", required=True)
+
+    site = Object(ISite, title=u"The site",
+                  required=True)
+    site_id = interface.Attribute("The site id")
+
+
 class IProject(interface.Interface):
     """
     Defines a Tableau project
