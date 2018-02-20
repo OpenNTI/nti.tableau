@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 from zope.interface.common.idatetime import IDateTime
 
 from nti.tableau.model import Site
+from nti.tableau.model import View
 from nti.tableau.model import Project
 from nti.tableau.model import Workbook
 from nti.tableau.model import Credentials
@@ -80,6 +81,13 @@ def parse_workbooks(text):
             tags.add(tag.get('label') or None)
         tags.discard(None)
         work.tags = list(tags) if tags else ()
+        # views
+        views = list()
+        for view in node.find_all('view'):
+            views.append(View(id=view.get('id'),
+                              name=view.get('name'),
+                              contentUrl=view.get('contentUrl')))
+        work.views = views or ()
         # add
         result.append(work)
     return result

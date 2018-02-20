@@ -12,9 +12,12 @@ from zope import interface
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.schema.eqhash import EqHash
+
 from nti.schema.schema import SchemaConfigured
 
 from nti.tableau.interfaces import ISite
+from nti.tableau.interfaces import IView
 from nti.tableau.interfaces import IProject
 from nti.tableau.interfaces import IWorkbook
 from nti.tableau.interfaces import ICredentials
@@ -28,6 +31,7 @@ class TableauInstance(SchemaConfigured):
     createDirectFieldProperties(ITableauInstance)
 
 
+@EqHash('id',)
 @interface.implementer(ISite)
 class Site(SchemaConfigured):
     createDirectFieldProperties(ISite)
@@ -43,11 +47,19 @@ class Credentials(SchemaConfigured):
         return self.site.id if self.site else None
 
 
+@EqHash('id',)
+@interface.implementer(IView)
+class View(SchemaConfigured):
+    createDirectFieldProperties(IView)
+
+
+@EqHash('id',)
 @interface.implementer(IProject)
 class Project(SchemaConfigured):
     createDirectFieldProperties(IProject)
 
 
+@EqHash('id',)
 @interface.implementer(IWorkbook)
 class Workbook(SchemaConfigured):
     createDirectFieldProperties(IWorkbook)
