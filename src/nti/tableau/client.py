@@ -66,6 +66,28 @@ class Client(object):
         return result
     workbooks = get_workbooks
 
+    def download_workbook(self, workbook, path, extract=False):
+        """
+        Download a workbook
+        """
+        result = None
+        if self.credentials:
+            tableau = self.tableau
+            wid = getattr(workbook, 'id', workbook)
+            # pylint: disable=no-member
+            url = "%s/api/%s/sites/%s/workbooks/%s/content?includeExtract=%s" % (tableau.url, tableau.api_version,
+                                                                                 self.credentials.site_id, 
+                                                                                 wid, extract)
+            response = requests.get(url, 
+                                    headers={"x-tableau-auth": self.credentials.token})
+            if response.status_code == 200:
+                result = path
+            else:
+                logger.error("Error getting workbook [%s]. %s", url,
+                             response.text)
+        return result
+
+    
     # login/logout
 
     def sign_in(self, site=""):

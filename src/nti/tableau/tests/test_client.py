@@ -38,7 +38,7 @@ class TestClient(unittest.TestCase):
         return TableauInstance(url="https://tableau.ou.edu",
                                site="gjh",
                                username="higg2108",
-                               password="mypassword")
+                               password="N3xtTh0ught!!C")
 
     def test_coverage(self):
         client = Client()
@@ -46,7 +46,7 @@ class TestClient(unittest.TestCase):
                     has_properties('tableau', is_(none())))
 
     @fudge.patch('requests.get')
-    def test_workboks(self, mock_get):
+    def test_workbooks(self, mock_get):
         client = Client(self.tableau())
         client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
                                                    user_id='d1d34a6e',
@@ -75,7 +75,7 @@ class TestClient(unittest.TestCase):
         """
         data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
         mock_get.is_callable().returns(data)
-        result = client.workbooks()
+        result = client.get_workbooks()
         assert_that(result, has_length(1))
         assert_that(result[0], validly_provides(IWorkbook))
         assert_that(result[0], verifiably_provides(IWorkbook))
@@ -96,6 +96,14 @@ class TestClient(unittest.TestCase):
         mock_get.is_callable().returns(data)
         result = client.workbooks()
         assert_that(result, is_(none()))
+
+
+    def test_download_workbook(self):
+        client = Client(self.tableau())
+        client.sign_in()
+        from IPython.terminal.debugger import set_trace;set_trace()
+        client.download_workbook('e32c29b7-bbde-46f5-a853-186842fa5426', '/tmp/workbook.twbx', False)
+        client.sign_out()
 
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):
