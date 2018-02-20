@@ -44,7 +44,7 @@ class Client(object):
 
     # workbooks
     
-    def workbooks(self):
+    def get_workbooks(self):
         """
         Returns a list of workbooks that the current user has permission to read
         """
@@ -64,6 +64,7 @@ class Client(object):
                 logger.error("Error getting workbooks [%s]. %s", url,
                              response.text)
         return result
+    workbooks = get_workbooks
 
     # login/logout
 
