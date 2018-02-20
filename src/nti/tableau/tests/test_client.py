@@ -9,6 +9,7 @@ from __future__ import absolute_import
 
 from hamcrest import is_
 from hamcrest import none
+from hamcrest import is_not
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_properties
@@ -97,13 +98,42 @@ class TestClient(unittest.TestCase):
         result = client.workbooks()
         assert_that(result, is_(none()))
 
-
-    def test_download_workbook(self):
+    @fudge.patch('requests.get')
+    def test_query_workbook(self, mock_get):
         client = Client(self.tableau())
-        client.sign_in()
-        from IPython.terminal.debugger import set_trace;set_trace()
-        client.download_workbook('e32c29b7-bbde-46f5-a853-186842fa5426', '/tmp/workbook.twbx', False)
-        client.sign_out()
+        client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
+                                                   user_id='d1d34a6e',
+                                                   token='6kOfTuDK')
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse xmlns="http://tableau.com/api"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://tableau.com/api
+                    http://tableau.com/api/ts-api-2.3.xsd">
+            <workbook id="3c3c4ef3" name="major" contentUrl="major"
+                      showTabs="false" size="1" createdAt="2018-01-24T17:16:45Z"
+                      updatedAt="2018-02-19T22:25:21Z">
+                <project id="9ba87b35" name="Default"/>
+                <owner id="b163ca04"/>
+                <tags>
+                    <tag label="Majors"/>
+                </tags>
+                <views>
+                    <view id="9a8a7b6b" contentUrl="Students/Majors" />
+                </views>
+            </workbook>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
+        mock_get.is_callable().returns(data)
+        workbook = client.query_workbook('e32c29b7')
+        assert_that(workbook, is_not(none()))
+
+        data = u"ERROR"
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=401)
+        mock_get.is_callable().returns(data)
+        result = client.query_workbook('xddz')
+        assert_that(result, is_(none()))
 
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):

@@ -43,7 +43,7 @@ class Client(object):
         ).decode('utf-8')
 
     # workbooks
-    
+
     def get_workbooks(self):
         """
         Returns a list of workbooks that the current user has permission to read
@@ -53,9 +53,9 @@ class Client(object):
             tableau = self.tableau
             # pylint: disable=no-member
             url = "%s/api/%s/sites/%s/users/%s/workbooks" % (tableau.url, tableau.api_version,
-                                                             self.credentials.site_id, 
+                                                             self.credentials.site_id,
                                                              self.credentials.user_id)
-            response = requests.get(url, 
+            response = requests.get(url,
                                     headers={"x-tableau-auth": self.credentials.token})
             if response.status_code == 200:
                 text = self.encode(response.text)
@@ -66,28 +66,28 @@ class Client(object):
         return result
     workbooks = get_workbooks
 
-    def download_workbook(self, workbook, path, extract=False):
+    def query_workbook(self, workbook):
         """
-        Download a workbook
+        Query a workbook
         """
         result = None
         if self.credentials:
             tableau = self.tableau
             wid = getattr(workbook, 'id', workbook)
             # pylint: disable=no-member
-            url = "%s/api/%s/sites/%s/workbooks/%s/content?includeExtract=%s" % (tableau.url, tableau.api_version,
-                                                                                 self.credentials.site_id, 
-                                                                                 wid, extract)
-            response = requests.get(url, 
+            url = "%s/api/%s/sites/%s/workbooks/%s" % (tableau.url, tableau.api_version,
+                                                       self.credentials.site_id, wid)
+            response = requests.get(url,
                                     headers={"x-tableau-auth": self.credentials.token})
             if response.status_code == 200:
-                result = path
+                text = self.encode(response.text)
+                result = parse_workbooks(text)
+                result = result[0] if result else None
             else:
                 logger.error("Error getting workbook [%s]. %s", url,
                              response.text)
         return result
 
-    
     # login/logout
 
     def sign_in(self, site=""):
@@ -134,6 +134,6 @@ class Client(object):
             tableau = self.tableau
             # pylint: disable=no-member
             url = "%s/api/%s/auth/signout" % (tableau.url, tableau.api_version)
-            requests.post(url, 
+            requests.post(url,
                           headers={'x-tableau-auth': self.credentials.token})
             self.credentials = None
