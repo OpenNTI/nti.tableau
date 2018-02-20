@@ -66,6 +66,9 @@ class TestClient(unittest.TestCase):
                     <tags>
                         <tag label="Majors"/>
                     </tags>
+                    <views>
+                        <view id="9a8a7b6b" contentUrl="Students/Majors" />
+                    </views>
                 </workbook>
             <workbooks>
         </tsResponse>

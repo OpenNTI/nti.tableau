@@ -67,7 +67,7 @@ class ISite(interface.Interface):
     id = TextLine(title=u"The id", required=True)
 
     name = TextLine(title=u"The name", required=False)
-    
+
     contentUrl = TextLine(title=u"The content URL",
                           required=False)
 
@@ -83,6 +83,18 @@ class ICredentials(interface.Interface):
     site = Object(ISite, title=u"The site",
                   required=True)
     site_id = interface.Attribute("The site id")
+
+
+class IView(interface.Interface):
+    """
+    Defines a Tableau view
+    """
+    id = TextLine(title=u"The id", required=True)
+
+    name = TextLine(title=u"The name", required=False)
+
+    contentUrl = TextLine(title=u"The content URL",
+                          required=False)
 
 
 class IProject(interface.Interface):
@@ -117,3 +129,8 @@ class IWorkbook(ILastModified):
                            min_length=0,
                            required=False,
                            value_type=TextLine(title=u"The tag"))
+
+    views = IndexedIterable(title=u"The views",
+                            min_length=0,
+                            required=False,
+                            value_type=Object(IView, title=u"The view"))
