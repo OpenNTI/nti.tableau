@@ -19,7 +19,7 @@ from zope import component
 
 from nti.tableau import API_VERSION
 
-from nti.tableau.interfaces import ITableauInstance
+from nti.tableau.interfaces import ITableauInstance, IExportView
 
 import nti.testing.base
 
@@ -38,14 +38,19 @@ ZCML_STRING = u"""
                     username="myuser" 
                     password="mypassword"
                     site="mysite" />
+                    
+    <tableau:registerExportView
+                    name="persons" 
+                    contentURL="person/Person" />
 </configure>
 """
 
 
 class TestZcml(nti.testing.base.ConfiguringTestBase):
 
-    def test_hive_tableau_registration(self):
+    def test_registrations(self):
         self.configure_string(ZCML_STRING)
+        # tableau
         tableau = component.queryUtility(ITableauInstance)
         assert_that(tableau, is_not(none()))
         assert_that(tableau, validly_provides(ITableauInstance))
@@ -56,3 +61,11 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
                                    "username", "myuser",
                                    "password", "mypassword",
                                    "api_version", API_VERSION))
+        # view
+        view = component.queryUtility(IExportView, name="persons")
+        assert_that(view, is_not(none()))
+        assert_that(view, validly_provides(IExportView))
+        assert_that(view, verifiably_provides(IExportView))
+        assert_that(view,
+                    has_properties("name", "persons",
+                                   "contentUrl", "person/Person"))
