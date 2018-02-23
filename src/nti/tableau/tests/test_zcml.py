@@ -19,7 +19,8 @@ from zope import component
 
 from nti.tableau import API_VERSION
 
-from nti.tableau.interfaces import ITableauInstance, IExportView
+from nti.tableau.interfaces import IExportView
+from nti.tableau.interfaces import ITableauInstance 
 
 import nti.testing.base
 
