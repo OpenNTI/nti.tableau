@@ -2,9 +2,15 @@
 			xmlns:meta="http://namespaces.zope.org/meta">
 
 	<meta:directives namespace="http://nextthought.com/ntp/tableau">
+
 		<meta:directive	name="registerTableauInstance"
 						schema=".zcml.IRegisterTableauInstance"
 						handler=".zcml.registerTableauInstance" />
+						
+		<meta:directive	name="registerExportView"
+						schema=".zcml.IRegisterExportView"
+						handler=".zcml.registerExportView" />
+
 	</meta:directives>
 
 </configure>

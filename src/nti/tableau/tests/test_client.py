@@ -134,6 +134,14 @@ class TestClient(unittest.TestCase):
         mock_get.is_callable().returns(data)
         result = client.query_workbook('xddz')
         assert_that(result, is_(none()))
+        
+#     def test_query_view(self):
+#         client = Client(self.tableau())
+#         client.sign_in()
+#         from IPython.terminal.debugger import set_trace;set_trace()
+#         client.query_workbook('b5e1b5c8-530e-4eff-9219-6c569112581b')
+#         pass
+#         client.sign_out()
 
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):

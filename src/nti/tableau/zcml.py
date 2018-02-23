@@ -22,8 +22,10 @@ from zope.schema import URI
 
 from nti.tableau import API_VERSION
 
+from nti.tableau.interfaces import IExportView
 from nti.tableau.interfaces import ITableauInstance
 
+from nti.tableau.model import ExportView
 from nti.tableau.model import TableauInstance
 
 logger = __import__('logging').getLogger(__name__)
@@ -61,3 +63,23 @@ def registerTableauInstance(_context, url, username, password, site=u'', api_ver
                                 username=username,
                                 api_version=api_version)
     utility(_context, provides=ITableauInstance, factory=factory)
+
+
+class IRegisterExportView(interface.Interface):
+    """
+    Provides a schema for registering a tableau export view
+    """
+    name = fields.TextLine(title=u"view name", required=True)
+
+    contentURL = fields.TextLine(title=u"The relative content url",
+                                 required=True)
+
+
+def registerExportView(_context, name, contentURL):
+    """
+    Register a tableau export view with the specified context
+    """
+    factory = functools.partial(ExportView,
+                                name=name,
+                                contentUrl=contentURL)
+    utility(_context, provides=IExportView, factory=factory, name=name)

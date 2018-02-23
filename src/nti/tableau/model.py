@@ -20,6 +20,7 @@ from nti.tableau.interfaces import ISite
 from nti.tableau.interfaces import IView
 from nti.tableau.interfaces import IProject
 from nti.tableau.interfaces import IWorkbook
+from nti.tableau.interfaces import IExportView
 from nti.tableau.interfaces import ICredentials
 from nti.tableau.interfaces import ITableauInstance
 
@@ -51,6 +52,12 @@ class Credentials(SchemaConfigured):
 @interface.implementer(IView)
 class View(SchemaConfigured):
     createDirectFieldProperties(IView)
+
+
+@EqHash('name',)
+@interface.implementer(IExportView)
+class ExportView(SchemaConfigured):
+    createDirectFieldProperties(IExportView)
 
 
 @EqHash('id',)

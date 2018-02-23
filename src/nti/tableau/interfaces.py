@@ -97,6 +97,16 @@ class IView(interface.Interface):
                           required=False)
 
 
+class IExportView(interface.Interface):
+    """
+    Defines a Tableau export view to be used w/ tabcmd
+    """
+    name = TextLine(title=u"The name", required=True)
+
+    contentUrl = TextLine(title=u"The content URL",
+                          required=True)
+
+
 class IProject(interface.Interface):
     """
     Defines a Tableau project
