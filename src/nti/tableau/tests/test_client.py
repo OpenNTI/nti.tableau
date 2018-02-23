@@ -39,7 +39,7 @@ class TestClient(unittest.TestCase):
         return TableauInstance(url="https://tableau.ou.edu",
                                site="gjh",
                                username="higg2108",
-                               password="N3xtTh0ught!!C")
+                               password="mypassword")
 
     def test_coverage(self):
         client = Client()
