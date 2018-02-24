@@ -51,8 +51,13 @@ class IRegisterTableauInstance(interface.Interface):
                                   default=API_VERSION,
                                   required=False)
 
+    tabcmd = fields.TextLine(title=u"The tabcmd location",
+                             default=u'tabcmd',
+                             required=True)
 
-def registerTableauInstance(_context, url, username, password, site=u'', api_version=API_VERSION):
+
+def registerTableauInstance(_context, url, username, password, site=u'',
+                            api_version=API_VERSION, tabcmd=u'tabcmd'):
     """
     Register a tableau instance with the specified context
     """
@@ -61,7 +66,8 @@ def registerTableauInstance(_context, url, username, password, site=u'', api_ver
                                 site=site or u'',
                                 password=password,
                                 username=username,
-                                api_version=api_version)
+                                api_version=api_version,
+                                tabcmd=tabcmd or u'tabcmd')
     utility(_context, provides=ITableauInstance, factory=factory)
 
 

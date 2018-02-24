@@ -58,6 +58,10 @@ class ITableauInstance(interface.Interface):
     api_version = TextLine(title=u"The api version",
                            default=API_VERSION,
                            required=True)
+    
+    tabcmd = TextLine(title=u"The tabcmd location",
+                      default=u'tabcmd',
+                      required=True)
 
 
 class ISite(interface.Interface):
