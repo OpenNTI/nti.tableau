@@ -1,0 +1,18 @@
+<!-- -*- mode: nxml -*- -->
+<configure  xmlns="http://namespaces.zope.org/zope"
+            xmlns:i18n="http://namespaces.zope.org/i18n"
+            xmlns:zcml="http://namespaces.zope.org/zcml"
+			xmlns:tableau="http://nextthought.com/ntp/tableau"
+			i18n_domain='nti.tableau'>
+
+	<include package="zope.component" file="meta.zcml" />
+	<include package="zope.component" />
+
+	<include package="nti.tableau" file="meta.zcml" />
+	<tableau:registerTableauInstance
+                    url="https://tableau.nextthought.com" 
+                    username="myuser" 
+                    password="mypassword"
+                    site="mysite" />
+
+</configure>
