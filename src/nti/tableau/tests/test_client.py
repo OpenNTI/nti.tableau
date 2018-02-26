@@ -134,14 +134,18 @@ class TestClient(unittest.TestCase):
         mock_get.is_callable().returns(data)
         result = client.query_workbook('xddz')
         assert_that(result, is_(none()))
-        
-#     def test_query_view(self):
-#         client = Client(self.tableau())
-#         client.sign_in()
-#         from IPython.terminal.debugger import set_trace;set_trace()
-#         client.query_workbook('b5e1b5c8-530e-4eff-9219-6c569112581b')
-#         pass
-#         client.sign_out()
+
+    @fudge.patch('nti.tableau.tabcmd.PyTabCmd.export')
+    def test_export_view(self, mock_exp):
+        mock_exp.is_callable().returns(__file__)
+        client = Client(self.tableau())
+        client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
+                                                   user_id='d1d34a6e',
+                                                   token='6kOfTuDK')
+        from IPython.terminal.debugger import set_trace
+        set_trace()
+        result = client.export_view('person/Persons', __file__)
+        assert_that(result, is_(__file__))
 
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):
