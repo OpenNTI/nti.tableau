@@ -8,6 +8,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import os
 import xml.etree.ElementTree as ET
 
 import requests
@@ -20,6 +21,8 @@ from nti.tableau.interfaces import ITableauInstance
 
 from nti.tableau.parsing import parse_workbooks
 from nti.tableau.parsing import parse_credentials
+
+from nti.tableau.tabcmd import PyTabCmd
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -86,6 +89,20 @@ class Client(object):
             else:
                 logger.error("Error getting workbook [%s]. %s", url,
                              response.text)
+        return result
+
+    # export
+
+    def export_view(self, view, path):
+        """
+        Export the contents of an export view
+        """
+        result = None
+        if self.credentials:
+            url = getattr(view, 'contentUrl', view)
+            tabcmd = PyTabCmd(self.tableau)
+            tabcmd.export(url, path)
+            result = path if os.path.exists(path) else None
         return result
 
     # login/logout
