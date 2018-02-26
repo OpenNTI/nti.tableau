@@ -43,3 +43,9 @@ class TestTabCmd(unittest.TestCase):
         mock_call.is_callable().returns_fake()
         tabcmd = PyTabCmd(self.tableau())
         tabcmd.login()
+        
+    @fudge.patch('subprocess.check_call')
+    def test_export(self, mock_call):
+        mock_call.is_callable().returns_fake()
+        tabcmd = PyTabCmd(self.tableau())
+        tabcmd.export("person/Persons", "-f persons.csv")
