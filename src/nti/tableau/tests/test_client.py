@@ -142,8 +142,6 @@ class TestClient(unittest.TestCase):
         client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
                                                    user_id='d1d34a6e',
                                                    token='6kOfTuDK')
-        from IPython.terminal.debugger import set_trace
-        set_trace()
         result = client.export_view('person/Persons', __file__)
         assert_that(result, is_(__file__))
 
