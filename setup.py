@@ -4,6 +4,7 @@ from setuptools import find_packages
 
 entry_points = {
     'console_scripts': [
+        "nti_tableau_export_view = nti.tableau.scripts.export_view:main",
     ],
 }
 
@@ -63,6 +64,7 @@ setup(
         'zope.cachedescriptors',
         'zope.component',
         'zope.configuration',
+        'zope.exceptions',
         'zope.interface',
         'zope.schema',
         'zope.security',
