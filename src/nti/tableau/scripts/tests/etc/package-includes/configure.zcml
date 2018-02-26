@@ -16,7 +16,7 @@
                     site="mysite" />
 
 	<tableau:registerExportView
-                    name="persons" 
-                    contentURL="person/Person" />
+					name="persons" 
+					contentURL="person/Person" />
 
 </configure>
