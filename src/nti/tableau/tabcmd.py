@@ -45,3 +45,16 @@ class PyTabCmd(object):
             "-t", "%s" % self.tableau.site,
         ]
         return self._execute_command(command)
+    
+    def export(self, url, path):
+        command = [
+            self.tableau.tabcmd,
+            'export',
+            "%s" % url,
+            "-u", "%s" % self.tableau.username,
+            "-p", "%s" % self.tableau.password,
+            "-s", "%s" % self.tableau.url,
+            "-t", "%s" % self.tableau.site,
+            "-f", "%s" % path,
+        ]
+        return self._execute_command(command)
