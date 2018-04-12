@@ -17,7 +17,11 @@ from hamcrest import has_properties
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
 
+import os
+import shutil
+import tempfile
 import unittest
+from six import StringIO
 
 import fudge
 
@@ -27,6 +31,7 @@ from nti.tableau.model import TableauInstance
 
 from nti.tableau.tests import SharedConfiguringTestLayer
 
+from nti.tableau.interfaces import IView
 from nti.tableau.interfaces import IWorkbook
 from nti.tableau.interfaces import ICredentials
 
@@ -135,15 +140,64 @@ class TestClient(unittest.TestCase):
         result = client.query_workbook('xddz')
         assert_that(result, is_(none()))
 
-    @fudge.patch('nti.tableau.tabcmd.PyTabCmd.export')
-    def test_export_view(self, mock_exp):
-        mock_exp.is_callable().returns(__file__)
+    @fudge.patch('requests.get')
+    def test_views(self, mock_get):
         client = Client(self.tableau())
         client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
                                                    user_id='d1d34a6e',
                                                    token='6kOfTuDK')
-        result = client.export_view('person/Persons', __file__)
-        assert_that(result, is_(__file__))
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse>
+            <views>
+                <view id="view-id" 
+                    name="view-name" 
+                    contentUrl="content-url" >
+                    <workbook id="workbook-id" />
+                    <owner id="owner-id" />
+                </view>
+            </views>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
+        mock_get.is_callable().returns(data)
+        result = client.query_views()
+        assert_that(result, has_length(1))
+        assert_that(result[0], validly_provides(IView))
+        assert_that(result[0], verifiably_provides(IView))
+        assert_that(result[0],
+                    has_properties('id', 'view-id',
+                                   'name', 'view-name',
+                                   'contentUrl', 'content-url',
+                                   'owner', 'owner-id'))
+
+        data = u"ERROR"
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=401)
+        mock_get.is_callable().returns(data)
+        result = client.query_views()
+        assert_that(result, is_(none()))
+
+    @fudge.patch('requests.get')
+    def test_export_view(self, mock_get):
+        data = StringIO("mydata")
+        response = fudge.Fake().has_attr(raw=data).has_attr(status_code=200)
+        mock_get.is_callable().returns(response)
+        client = Client(self.tableau())
+        client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
+                                                   user_id='d1d34a6e',
+                                                   token='6kOfTuDK')
+        tempdir = tempfile.mkdtemp()
+        try:
+            path = os.path.join(tempdir, 'out.csv')
+            result = client.export_view('view_id', path)
+            assert_that(result, is_(path))
+        finally:
+            shutil.rmtree(tempdir, True)
+
+        response = fudge.Fake().has_attr(text="ERROR").has_attr(status_code=403)
+        mock_get.is_callable().returns(response)
+        result = client.export_view('view_id')
+        assert_that(result, is_(none()))
 
     @fudge.patch('requests.post')
     def test_sign_in(self, mock_post):

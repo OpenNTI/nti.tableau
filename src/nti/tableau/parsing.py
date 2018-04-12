@@ -51,6 +51,38 @@ def parse_credentials(text):
     return result
 
 
+def parse_views(text):
+    """
+    Returns a list of views from the specified text
+    """
+    result = []
+    xml_response = BeautifulSoup(text, 'xml')
+    for node in xml_response.find_all("view"):
+        view = View(id=node.get('id'),
+                    name=node.get('name'),
+                    contentUrl=node.get('contentUrl'))
+        # dates
+        view.createdAt = parse_datetime(node.get('createdAt'))
+        view.updatedAt = parse_datetime(node.get('updatedAt'))
+        # workbook
+        workbook = node.find('workbook')
+        if workbook:
+            view.workbook = workbook.get('id')
+        # owner
+        owner = node.find('owner')
+        if owner:
+            view.owner = owner.get('id')
+        # tags
+        tags = set()
+        for tag in node.find_all('tag'):
+            tags.add(tag.get('label') or None)
+        tags.discard(None)
+        view.tags = list(tags) if tags else ()
+        # add
+        result.append(view)
+    return result
+
+
 def parse_workbooks(text):
     """
     Returns a list of workbooks from the specified text

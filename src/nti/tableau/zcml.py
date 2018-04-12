@@ -77,15 +77,15 @@ class IRegisterExportView(interface.Interface):
     """
     name = fields.TextLine(title=u"view name", required=True)
 
-    contentURL = fields.TextLine(title=u"The relative content url",
-                                 required=True)
+    view_id = fields.TextLine(title=u"The view id",
+                              required=True)
 
 
-def registerExportView(_context, name, contentURL):
+def registerExportView(_context, name, view_id):
     """
     Register a tableau export view with the specified context
     """
     factory = functools.partial(ExportView,
                                 name=name,
-                                contentUrl=contentURL)
+                                view_id=view_id)
     utility(_context, provides=IExportView, factory=factory, name=name)

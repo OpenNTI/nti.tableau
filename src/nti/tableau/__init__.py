@@ -8,4 +8,4 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-API_VERSION = u'2.3'
+API_VERSION = u'2.8'

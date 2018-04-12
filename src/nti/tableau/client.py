@@ -8,7 +8,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-import os
+import shutil
 import xml.etree.ElementTree as ET
 
 import requests
@@ -19,10 +19,9 @@ from zope.cachedescriptors.property import readproperty
 
 from nti.tableau.interfaces import ITableauInstance
 
+from nti.tableau.parsing import parse_views
 from nti.tableau.parsing import parse_workbooks
 from nti.tableau.parsing import parse_credentials
-
-from nti.tableau.tabcmd import PyTabCmd
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -91,19 +90,52 @@ class Client(object):
                              response.text)
         return result
 
-    # export
-
-    def export_view(self, view, path):
+    def query_views(self,):
         """
-        Export the contents of an export view
+        Returns a list of views that the current user has permission to read
         """
         result = None
         if self.credentials:
-            url = getattr(view, 'contentUrl', view)
-            tabcmd = PyTabCmd(self.tableau)
-            tabcmd.export(url, path)
-            result = path if os.path.exists(path) else None
+            tableau = self.tableau
+            # pylint: disable=no-member
+            url = "%s/api/%s/sites/%s/views" % (tableau.url, tableau.api_version,
+                                                self.credentials.site_id)
+            response = requests.get(url,
+                                    headers={"x-tableau-auth": self.credentials.token})
+            if response.status_code == 200:
+                text = self.encode(response.text)
+                result = parse_views(text)
+            else:
+                logger.error("Error getting views [%s]. %s", url,
+                             response.text)
         return result
+    views = query_views
+
+    def query_view_data(self, view, path=None):
+        """
+        Query a view data
+        """
+        result = None
+        if self.credentials:
+            tableau = self.tableau
+            vid = getattr(view, 'id', view)
+            path = path or vid
+            # pylint: disable=no-member
+            url = "%s/api/%s/sites/%s/views/%s/data" % (tableau.url, tableau.api_version,
+                                                        self.credentials.site_id, vid)
+            response = requests.get(url,
+                                    headers={
+                                        "x-tableau-auth": self.credentials.token},
+                                    stream=True)
+            if response.status_code == 200:
+                result = path
+                with open(result, 'w') as fp:
+                    shutil.copyfileobj(response.raw, fp)
+            else:
+                logger.error("Error getting view data [%s]. %s", url,
+                             response.text)
+        return result
+    export_view = query_view_data
 
     # login/logout
 
