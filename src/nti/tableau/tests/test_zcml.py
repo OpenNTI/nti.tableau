@@ -42,7 +42,7 @@ ZCML_STRING = u"""
                     
     <tableau:registerExportView
                     name="persons" 
-                    contentURL="person/Person" />
+                    view_id="xyz" />
 </configure>
 """
 
@@ -69,4 +69,4 @@ class TestZcml(nti.testing.base.ConfiguringTestBase):
         assert_that(view, verifiably_provides(IExportView))
         assert_that(view,
                     has_properties("name", "persons",
-                                   "contentUrl", "person/Person"))
+                                   "view_id", "xyz"))

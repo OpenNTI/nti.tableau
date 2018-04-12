@@ -13,7 +13,7 @@ import argparse
 
 from zope import component
 
-from nti.tableau.tabcmd import PyTabCmd
+from nti.tableau.client import Client
 
 from nti.tableau.interfaces import IExportView
 from nti.tableau.interfaces import ITableauInstance
@@ -37,8 +37,8 @@ def process_args(args=None):
     group.add_argument('-n', '--name', dest='name',
                        help="view name")
 
-    group.add_argument('-u', '--url', dest='url',
-                       help="View url")
+    group.add_argument('-i', '--vid', dest='view_id',
+                       help="View id")
     args = arg_parser.parse_args(args)
 
     # logging
@@ -54,19 +54,20 @@ def process_args(args=None):
     assert output and not os.path.isdir(output), \
           "Must specify an output file"
 
-    url = args.url
     name = args.name
+    view_id = args.view_id
     if name:
         view = component.queryUtility(IExportView, name)
         assert view is not None, "Must specify an tableau export view"
-        url = view.contentUrl
+        view_id = view.view_id
 
     # check url
-    assert url, "Must specfify a valid content url"
+    assert view_id, "Must specfify a valid view id"
 
     # execute
-    tabcmd = PyTabCmd(tableau)
-    tabcmd.export(url, output)
+    client = Client(tableau)
+    client.sign_in()
+    client.export_view(view_id, output)
 
 
 def main(args=None):

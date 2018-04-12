@@ -17,6 +17,6 @@
 
 	<tableau:registerExportView
 					name="persons" 
-					contentURL="person/Person" />
+					view_id="xyz" />
 
 </configure>

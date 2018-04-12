@@ -58,7 +58,7 @@ class ITableauInstance(interface.Interface):
     api_version = TextLine(title=u"The api version",
                            default=API_VERSION,
                            required=True)
-    
+
     tabcmd = TextLine(title=u"The tabcmd location",
                       default=u'tabcmd',
                       required=True)
@@ -89,7 +89,7 @@ class ICredentials(interface.Interface):
     site_id = interface.Attribute("The site id")
 
 
-class IView(interface.Interface):
+class IView(ILastModified):
     """
     Defines a Tableau view
     """
@@ -100,15 +100,26 @@ class IView(interface.Interface):
     contentUrl = TextLine(title=u"The content URL",
                           required=False)
 
+    owner = TextLine(title=u"The owner id",
+                     required=False)
+
+    workbook = TextLine(title=u"The workbook id",
+                        required=False)
+
+    tags = IndexedIterable(title=u"The tags",
+                           min_length=0,
+                           required=False,
+                           value_type=TextLine(title=u"The tag"))
+
 
 class IExportView(interface.Interface):
     """
-    Defines a Tableau export view to be used w/ tabcmd
+    Defines a Tableau export view
     """
     name = TextLine(title=u"The name", required=True)
 
-    contentUrl = TextLine(title=u"The content URL",
-                          required=True)
+    view_id = TextLine(title=u"The view id",
+                       required=True)
 
 
 class IProject(interface.Interface):
