@@ -90,7 +90,7 @@ class Client(object):
                              response.text)
         return result
 
-    def query_views(self,):
+    def query_views(self):
         """
         Returns a list of views that the current user has permission to read
         """
@@ -111,9 +111,24 @@ class Client(object):
         return result
     views = query_views
 
+    def search_view(self, vid=None, name=None, contentUrl=None):
+        """
+        Search and return view w/ the specified params
+        
+        :param vid: The view id
+        :param name: The view name
+        :param contentUrl: The view contentUrl
+        """
+        for view in self.query_views() or ():
+            if view.name == name or view.id == vid or view.contentUrl == contentUrl:
+                return view
+
     def query_view_data(self, view, path=None):
         """
         Query a view data
+        
+        :param view: The view [id]
+        :param path: The path to save the view data
         """
         result = None
         if self.credentials:
