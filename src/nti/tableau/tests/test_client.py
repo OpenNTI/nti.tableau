@@ -178,6 +178,33 @@ class TestClient(unittest.TestCase):
         assert_that(result, is_(none()))
 
     @fudge.patch('requests.get')
+    def test_search_view(self, mock_get):
+        client = Client(self.tableau())
+        client.credentials = fudge.Fake().has_attr(site_id='cb0f02e9',
+                                                   user_id='d1d34a6e',
+                                                   token='6kOfTuDK')
+        data = u"""
+        <?xml version='1.0' encoding='UTF-8'?>
+        <tsResponse>
+            <views>
+                <view id="myview" 
+                    name="view-name" 
+                    contentUrl="content-url" >
+                    <workbook id="workbook-id" />
+                    <owner id="owner-id" />
+                </view>
+            </views>
+        </tsResponse>
+        """
+        data = fudge.Fake().has_attr(text=data).has_attr(status_code=200)
+        mock_get.is_callable().returns(data)
+        result = client.search_view("myview")
+        assert_that(result, is_not(none()))
+        # no hit
+        result = client.search_view("xxx")
+        assert_that(result, is_(none()))
+
+    @fudge.patch('requests.get')
     def test_export_view(self, mock_get):
         data = StringIO("mydata")
         response = fudge.Fake().has_attr(raw=data).has_attr(status_code=200)
