@@ -35,7 +35,7 @@ def process_args(args=None):
     group = arg_parser.add_mutually_exclusive_group()
 
     group.add_argument('-n', '--name', dest='name',
-                       help="view name")
+                       help="registered view name")
 
     group.add_argument('-i', '--vid', dest='view_id',
                        help="View id")
