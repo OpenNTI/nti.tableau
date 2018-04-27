@@ -5,6 +5,7 @@ from setuptools import find_packages
 entry_points = {
     'console_scripts': [
         "nti_tableau_export_view = nti.tableau.scripts.export_view:main",
+        "nti_tableau_query_views = nti.tableau.scripts.query_views:main",
     ],
 }
 
