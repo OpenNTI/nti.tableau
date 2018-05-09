@@ -204,7 +204,7 @@ class Client(object):
             self.credentials = None
 
 
-def export_view(view, path, tableau=None):  # pragma: no cover
+def export_view(view, path, tableau=None):
     tableau = component.getUtility(ITableauInstance) if tableau is None else tableau
     client = Client(tableau)
     client.sign_in()
