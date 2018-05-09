@@ -13,7 +13,7 @@ import argparse
 
 from zope import component
 
-from nti.tableau.client import Client
+from nti.tableau.client import export_view
 
 from nti.tableau.interfaces import IExportView
 from nti.tableau.interfaces import ITableauInstance
@@ -65,9 +65,7 @@ def process_args(args=None):
     assert view_id, "Must specfify a valid view id"
 
     # execute
-    client = Client(tableau)
-    client.sign_in()
-    client.export_view(view_id, output)
+    export_view(view_id, output, tableau)
 
 
 def main(args=None):

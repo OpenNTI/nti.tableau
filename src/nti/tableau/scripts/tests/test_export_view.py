@@ -23,10 +23,8 @@ class TestExportView(unittest.TestCase):
         mock_pa.expects_call().returns_fake()
         sync_main()
 
-    @fudge.patch('nti.tableau.scripts.export_view.Client.sign_in',
-                 'nti.tableau.scripts.export_view.Client.export_view')
-    def test_process_args(self, mock_sign_in, mock_export_view):
-        mock_sign_in.expects_call().returns_fake()
+    @fudge.patch('nti.tableau.scripts.export_view.export_view',)
+    def test_process_args(self, mock_export_view):
         mock_export_view.expects_call().returns_fake()
         dirname = os.path.dirname(__file__)
         output = os.path.join(dirname, "output.csv")
