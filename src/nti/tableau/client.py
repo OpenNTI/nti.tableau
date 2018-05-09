@@ -114,7 +114,7 @@ class Client(object):
     def search_view(self, vid=None, name=None, contentUrl=None):
         """
         Search and return view w/ the specified params
-        
+
         :param vid: The view id
         :param name: The view name
         :param contentUrl: The view contentUrl
@@ -126,7 +126,7 @@ class Client(object):
     def query_view_data(self, view, path=None):
         """
         Query a view data
-        
+
         :param view: The view [id]
         :param path: The path to save the view data
         """
@@ -140,7 +140,8 @@ class Client(object):
                                                         self.credentials.site_id, vid)
             response = requests.get(url,
                                     headers={
-                                        "x-tableau-auth": self.credentials.token},
+                                        "x-tableau-auth": self.credentials.token
+                                    },
                                     stream=True)
             if response.status_code == 200:
                 result = path
@@ -201,3 +202,11 @@ class Client(object):
             requests.post(url,
                           headers={'x-tableau-auth': self.credentials.token})
             self.credentials = None
+
+
+def export_view(view, path, tableau=None):
+    tableau = component.getUtility(ITableauInstance) if tableau is None else tableau
+    client = Client(tableau)
+    client.sign_in()
+    client.export_view(view, path)
+    client.sign_out()
