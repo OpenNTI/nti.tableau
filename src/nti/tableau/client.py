@@ -111,6 +111,9 @@ class Client(object):
         return result
     views = query_views
 
+    def to_lower(self, s):
+        return (s or '').lower()
+
     def search_view(self, vid=None, name=None, contentUrl=None):
         """
         Search and return view w/ the specified params
@@ -119,8 +122,13 @@ class Client(object):
         :param name: The view name
         :param contentUrl: The view contentUrl
         """
+        vid = self.to_lower(vid)
+        name = self.to_lower(name)
+        contentUrl = self.to_lower(contentUrl)
         for view in self.query_views() or ():
-            if view.name == name or view.id == vid or view.contentUrl == contentUrl:
+            if     (vid and self.to_lower(view.id) == vid) \
+                or (name and self.to_lower(view.name) == name) \
+                or (contentUrl and self.to_lower(view.contentUrl) == contentUrl):
                 return view
 
     def query_view_data(self, view, path=None):
@@ -208,5 +216,19 @@ def export_view(view, path, tableau=None):
     tableau = component.getUtility(ITableauInstance) if tableau is None else tableau
     client = Client(tableau)
     client.sign_in()
-    client.export_view(view, path)
-    client.sign_out()
+    try:
+        client.export_view(view, path)
+    finally:
+        client.sign_out()
+
+
+def search_view(vid=None, name=None, tableau=None):
+    view_id = getattr(vid, 'id', vid)
+    view_name = getattr(name, 'name', name)
+    tableau = component.getUtility(ITableauInstance) if tableau is None else tableau
+    client = Client(tableau)
+    client.sign_in()
+    try:
+        return client.search_view(view_id, view_name)
+    finally:
+        client.sign_out()
