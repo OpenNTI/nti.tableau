@@ -26,6 +26,7 @@ from six import StringIO
 import fudge
 
 from nti.tableau.client import Client
+from nti.tableau.client import search_view
 from nti.tableau.client import export_view
 
 from nti.tableau.model import TableauInstance
@@ -280,3 +281,12 @@ class TestClient(unittest.TestCase):
         mock_sign_out.expects_call().returns_fake()
         mock_export_view.expects_call().returns_fake()
         export_view('myview', '/tmp', self.tableau())
+        
+    @fudge.patch('nti.tableau.client.Client.sign_in',
+                 'nti.tableau.client.Client.search_view',
+                 'nti.tableau.client.Client.sign_out')
+    def test_search_view_call(self, mock_sign_in, mock_export_view, mock_sign_out):
+        mock_sign_in.expects_call().returns_fake()
+        mock_sign_out.expects_call().returns_fake()
+        mock_export_view.expects_call().returns_fake()
+        search_view("myid", 'myview', self.tableau())
