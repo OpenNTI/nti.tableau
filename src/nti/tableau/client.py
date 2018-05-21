@@ -217,7 +217,7 @@ def export_view(view, path, tableau=None):
     client = Client(tableau)
     client.sign_in()
     try:
-        client.export_view(view, path)
+        return client.export_view(view, path)
     finally:
         client.sign_out()
 
